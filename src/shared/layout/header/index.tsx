@@ -26,7 +26,7 @@ const HeaderAppBar = () => {
   };
 
   return (
-    <AppBar position="static">
+    <AppBar position="static" sx={ { backgroundColor: '#073065' } }>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <img src={Logo} alt="logo" />
