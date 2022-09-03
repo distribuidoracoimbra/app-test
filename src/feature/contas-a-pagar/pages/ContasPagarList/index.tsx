@@ -6,10 +6,12 @@ import { Column } from "primereact/column";
 import { DataTable } from "primereact/datatable";
 import { InputText } from "primereact/inputtext";
 import { Tooltip } from "primereact/tooltip";
+import { Toast } from "primereact/toast";
 
 import { useEffect, useRef, useState } from "react";
 
 import { ProductService } from "../../services/ProductService";
+import { Dropdown } from "primereact/dropdown";
 
 const ContasPagarListDT = () => {
   const [products, setProducts] = useState([]);
@@ -19,7 +21,11 @@ const ContasPagarListDT = () => {
   const [selectedProducts, setSelectedProducts] = useState(null);
   const [globalFilterValue1, setGlobalFilterValue1] = useState("");
   const [filters1, setFilters1] = useState<any>(null);
+  const [expandedRows, setExpandedRows] = useState([]);
+  const [rowsGroup, setRowsGroup] = useState<any>("");
+
   const dt = useRef(null);
+  const toast = useRef(null);
 
   const productService = new ProductService();
 
@@ -73,6 +79,7 @@ const ContasPagarListDT = () => {
 
   const clearFilter1 = () => {
     initFilters1();
+    setRowsGroup("");
   };
 
   const onGlobalFilterChange1 = (e: any) => {
@@ -83,6 +90,14 @@ const ContasPagarListDT = () => {
     setFilters1(_filters1);
     setGlobalFilterValue1(value);
   };
+
+  const onRowGroupChange = (e: any) => {
+    setRowsGroup(e.value);
+  };
+
+  const columns = [
+    { name: "Categoria" }
+  ];
 
   const renderHeader1 = () => {
     return (
@@ -95,6 +110,7 @@ const ContasPagarListDT = () => {
             className="p-button-outlined"
             onClick={clearFilter1}
           />
+
           <span className="p-input-icon-left">
             <i className="pi pi-search" />
             <InputText
@@ -103,6 +119,31 @@ const ContasPagarListDT = () => {
               placeholder="Pesquisar"
             />
           </span>
+
+          {/* <Button
+            type="button"
+            label="Agrupar"
+            className="p-button-outlined"
+            onClick={ () => setRowsGroup(!rowsGroup) }
+          /> */}
+          <div>
+            <Dropdown
+              value={rowsGroup}
+              options={columns}
+              onChange={onRowGroupChange}
+              optionLabel="name"
+              placeholder="Agrupar coluna"
+            />
+            {/* <select
+              value={rowsGroup}
+              onChange={(e) => setRowsGroup(e.target.value)}
+              name=""
+              id=""
+            >
+              <option value="">Nenhum</option>
+              <option value="name">Categoria</option>
+            </select> */}
+          </div>
         </div>
       </>
     );
@@ -188,6 +229,32 @@ const ContasPagarListDT = () => {
   //     });
   //   };
 
+  //   const onRowGroupExpand = (event:any) => {
+  //     toast.current.show({
+  //       severity: "info",
+  //       summary: "Row Group Expanded",
+  //       detail: "Value: " + event.data.category,
+  //       life: 3000,
+  //     });
+  //   };
+
+  //   const onRowGroupCollapse = (event:any) => {
+  //     toast.current.show({
+  //       severity: "success",
+  //       summary: "Row Group Collapsed",
+  //       detail: "Value: " + event.data.category,
+  //       life: 3000,
+  //     });
+  //   };
+
+  const headerTemplate = (data: any) => {
+    return (
+      <>
+        <span className="image-text">{data.category}</span>
+      </>
+    );
+  };
+
   return (
     <div>
       <div className="card">
@@ -218,6 +285,12 @@ const ContasPagarListDT = () => {
             "price",
           ]}
           emptyMessage="Nenhum dado encontrado."
+          expandableRowGroups={rowsGroup}
+          expandedRows={expandedRows}
+          onRowToggle={(e: any) => setExpandedRows(e.data)}
+          rowGroupMode={rowsGroup === "" ? "" : "subheader"}
+          groupRowsBy="category"
+          rowGroupHeaderTemplate={headerTemplate}
         >
           <Column
             selectionMode="multiple"
